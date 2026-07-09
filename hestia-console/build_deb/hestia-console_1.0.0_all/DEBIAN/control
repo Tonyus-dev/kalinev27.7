@@ -1,0 +1,7 @@
+Package: hestia-console
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Kaline <kaline@localhost>
+Description: Héstia Console MVP for local monitoring

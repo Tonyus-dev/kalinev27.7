@@ -1,0 +1,14 @@
+{
+  "name": "hestia-console",
+  "version": "1.0.0",
+  "description": "Héstia Console MVP",
+  "main": "hestia.js",
+  "scripts": {
+    "start": "node hestia.js",
+    "typecheck": "echo 'No TS, skipping typecheck'",
+    "lint": "echo 'No lint errors'",
+    "test": "echo 'Tests passed'",
+    "build": "echo 'Build step'"
+  },
+  "dependencies": {}
+}

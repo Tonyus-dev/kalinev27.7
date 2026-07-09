@@ -1,0 +1,12 @@
+[Unit]
+Description=Héstia Console MVP
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/hestia-console/hestia.js
+Restart=on-failure
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

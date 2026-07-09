@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Héstia Console
+Comment=Local console for Kaline
+Exec=hestia-console
+Icon=hestia-console
+Terminal=false
+Type=Application
+Categories=Utility;

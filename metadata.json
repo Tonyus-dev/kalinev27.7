@@ -1,0 +1,6 @@
+{
+  "name": "Controle de Rotina",
+  "description": "Um aplicativo PWA focado no controle de rotina e hábitos diários, inspirado em aplicativos consagrados de bem-estar e produtividade.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

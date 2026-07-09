@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-bounce-slow: bounce 2s infinite;
+}
+
+:root {
+  --bg: #06070A;
+  --surface: #0B0D12;
+  --surface-2: #10131A;
+  --border: #252936;
+
+  --text: #F7EFE7;
+  --muted: #A89F96;
+
+  --neon-orange: #FF4C1F;
+  --neon-orange-soft: #FF7A3D;
+  --ember: #C2410C;
+  --gold-fire: #F59E0B;
+
+  --kaline: #C98A65;
+  --hestia: #EAB308;
+  --hefaistia: #FF4C1F;
+  --kuanyin: #BE185D;
+  --kharis: #2563EB;
+
+  --radius-card: 24px;
+  --radius-soft: 16px;
+
+  --glow-orange: 0 0 18px rgba(255, 76, 31, 0.35), 0 0 42px rgba(255, 76, 31, 0.15);
+  --glass: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.ritual-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+/* Custom background grid pattern matching spec */
+.app-bg {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 76, 31, 0.15), transparent 45%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    #06070A;
+  background-size: auto, 48px 48px, 48px 48px, auto;
+}
+
+.system-card {
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255, 76, 31, 0.14);
+  background: var(--glass), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.system-card:hover, .system-card[data-active="true"] {
+  border-color: rgba(255, 76, 31, 0.4);
+  box-shadow: var(--glow-orange), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Custom styles for iOS PWA immersion */
+@supports (padding: max(0px)) {
+  body {
+    padding-top: min(12px, env(safe-area-inset-top));
+    padding-bottom: min(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Hide scrollbar for clean app design */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
