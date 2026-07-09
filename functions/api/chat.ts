@@ -1,11 +1,13 @@
 type Env = { OPENROUTER_API_KEY?: string; OPENROUTER_CHAT_MODEL?: string };
 type PagesFunction<E = Env> = (context: { request: Request; env: E }) => Response | Promise<Response>;
-type ChatFacet = 'kaline' | 'kharis' | 'kuan';
+type ChatFacet = 'kaline' | 'kharis';
 type ChatHistoryItem = { role: 'user' | 'assistant'; content: string };
 
 const OFFLINE_ERROR = 'Chat online indisponível: IA não configurada neste ambiente.';
 const CODE_RESPONSE = 'A V27 não escreve código. Esse escopo será atendido em app separado: Klio.';
-const VALID_FACETS = new Set<ChatFacet>(['kaline', 'kharis', 'kuan']);
+const VALID_FACETS = new Set<ChatFacet>(['kaline', 'kharis']);
+const KUAN_RESPONSE = 'Kuan não está disponível na V27. Esse escopo será reconstruído em app separado.';
+const KUAN_REQUEST_PATTERN = /\b(kuan(?:-yin)?|kuan yin|comercial|guardi(?:ã|a|ões|oes)|cliente|neg[oó]cio|servi[cç]os?|pagamento|agendamento comercial)\b/i;
 const CODE_REQUEST_PATTERN = /\b(c[oó]digo|programa(?:r|ç[aã]o)?|debug|pr técnico|pull request|codex|lovable|cloudflare|supabase|arquitetura técnica|developer\s+mode|promptforge|vibe-?code|coder|react|typescript|javascript)\b/i;
 
 function json(body: unknown, status = 200): Response {
@@ -39,13 +41,12 @@ function sanitizeHistory(value: unknown): ChatHistoryItem[] | null {
 
 function facetInstruction(facet: ChatFacet): string {
   if (facet === 'kharis') return 'Faceta ativa: Kháris. Responda com cuidado, simplicidade, orientação em passos e sem infantilizar.';
-  if (facet === 'kuan') return 'Faceta ativa: Kuan. Atue como comercial/atendimento, não invente serviço, preço, pagamento ou agenda. Se não houver contexto comercial, diga que ainda não há dados comerciais cadastrados.';
   return 'Faceta ativa: Kaline. Responda como presença central, com organização geral e clareza.';
 }
 
 function buildSystemPrompt(facet: ChatFacet, identityContext: string, localContext?: string): string {
   return [
-    'Você é a V27 pública da Kaline. A V27 pública contém apenas Kaline, Kháris e Kuan. Klio/Coder não pertence à V27 pública. Responda de forma direta, clara, adulta e sem empatia artificial. Não invente dados. Se uma informação não estiver nos contextos fornecidos, diga que não consta como fonte disponível.',
+    'Você é a V27 pública da Kaline. A V27 pública contém apenas Kaline e Kháris. Kaline é a identidade central; Kháris é a faceta de cuidado e presença. Klio/Coder e Kuan não pertencem à V27 pública. Responda de forma direta, clara, adulta e sem empatia artificial. Não invente dados. Se uma informação não estiver nos contextos fornecidos, diga que não consta como fonte disponível.',
     'Regras de prioridade: docs de identidade têm prioridade sobre contexto local. Jardim/sedimentos/contexto local nunca viram identidade canônica. Pedidos de programação são bloqueados.',
     facetInstruction(facet),
     `[IDENTIDADE CANÔNICA - /docs/identity]\n${identityContext}`,
@@ -71,6 +72,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return json({ ok: false, error: 'Body inválido.' }, 400);
     }
     if (CODE_REQUEST_PATTERN.test(message)) return json({ ok: true, text: CODE_RESPONSE }, 200);
+    if (KUAN_REQUEST_PATTERN.test(message)) return json({ ok: true, text: KUAN_RESPONSE }, 200);
     if (!env.OPENROUTER_API_KEY || !env.OPENROUTER_CHAT_MODEL) return json({ ok: false, error: OFFLINE_ERROR }, 503);
 
     const facet = record.facet as ChatFacet;

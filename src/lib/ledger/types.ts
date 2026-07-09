@@ -1,4 +1,4 @@
-export type LedgerFacet = "kaline" | "kharis" | "kuan" | "klio";
+export type LedgerFacet = "kaline" | "kharis";
 
 export type LedgerVisibility = "private" | "facet_only" | "shared";
 

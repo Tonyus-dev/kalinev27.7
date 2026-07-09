@@ -10,7 +10,8 @@ export default function GuardiaoPanel() {
 
   const [activeDialogueFacet, setActiveDialogueFacet] = useState(() => {
     const saved = localStorage.getItem('kaline_active_dialogue_facet');
-    return saved === 'kharis' || saved === 'kuan' ? saved : 'kaline';
+    if (saved === 'kuan' || saved === 'kuanyin' || saved === 'kuan-yin') localStorage.setItem('kaline_active_dialogue_facet', 'kaline');
+    return saved === 'kharis' ? saved : 'kaline';
   });
 
   const [promptCaching, setPromptCaching] = useState(() => localStorage.getItem('kaline_prompt_caching') !== 'false');
@@ -32,8 +33,7 @@ export default function GuardiaoPanel() {
     { id: 'agenda', name: 'Agenda', desc: 'Ver e criar eventos e lembretes do calendário.' },
     { id: 'treinos', name: 'Treinos', desc: 'Acompanhar e registrar treinos, séries, PRs e sinais do corpo.' },
     { id: 'livros', name: 'Livros & Resumos', desc: 'Acessar a biblioteca, resumos e infográficos.' },
-    { id: 'eco', name: 'Câmara de Eco', desc: 'Subir áudios, conversas e atas para eco e transcrição.' },
-    { id: 'kuanyin', name: 'Kuan-Yin (Comercial)', desc: 'Conversar em modo comercial, configurar negócio e cadastrar clientes.' }
+    { id: 'eco', name: 'Câmara de Eco', desc: 'Subir áudios, conversas e atas para eco e transcrição.' }
   ];
 
   return (
@@ -158,7 +158,6 @@ export default function GuardiaoPanel() {
             >
               <option value="kaline">Kaline (Naturalidade e Presença)</option>
               <option value="kharis">Kháris (Cuidado, Simplicidade e Gentileza)</option>
-              <option value="kuan">Kuan (Comercial e Atendimento)</option>
             </select>
             <p className="text-[8px] text-[#A89F96]">
               O administrador escolhe com qual faceta da Kaline os outros usuários podem conversar.

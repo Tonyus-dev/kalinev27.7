@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Send, Mic, MicOff, Volume2, Pause, Play, GitBranch } from 'lucide-react';
 import { sendChatMessage, type ChatHistoryItem } from '../lib/chat/client';
-import { buildIdentityContext, isV27CodeRequest, V27_CODE_RESPONSE } from '../lib/identityDocs';
+import { buildIdentityContext, isV27CodeRequest, isV27KuanRequest, V27_CODE_RESPONSE, V27_KUAN_RESPONSE } from '../lib/identityDocs';
 import { addSedimentCandidate, listGardenMemories, listSediments, type FacetId, type GardenMemory, type Sediment } from '../lib/sedimentation';
 import KittScanner, { KittState } from './KittScanner';
 
@@ -43,16 +43,6 @@ const FACET_META: Record<FacetId, {
     bubbleSelf: 'bg-[#251303]/95',
     tag: 'KHÁRIS',
   },
-  kuan: {
-    name: 'Kuan',
-    avatar: 'KU',
-    image: '/brand/kaline.png',
-    color: 'text-[#C98A65]',
-    border: 'border-[#C98A65]',
-    bg: 'bg-[#C98A65]',
-    bubbleSelf: 'bg-[#1B0E05]/95',
-    tag: 'KUAN',
-  },
 };
 
 function now() {
@@ -61,7 +51,6 @@ function now() {
 
 function initialText(facet: FacetId): string {
   if (facet === 'kharis') return 'Olá! Sou a Kháris. Posso responder em passos simples, sem infantilizar.';
-  if (facet === 'kuan') return 'Olá! Sou a Kuan. Posso atender com dados comerciais reais disponíveis, sem inventar serviços, preços ou agenda.';
   return 'Olá! Sou a Kaline. Meu canal de presença está pronto para conversar com identidade canônica e contexto real disponível.';
 }
 
@@ -73,7 +62,7 @@ function buildLocalContext(memories: GardenMemory[]): string | undefined {
 
 function historyFromMessages(messages: Message[]): ChatHistoryItem[] {
   return messages
-    .filter(message => message.sender === 'user' || message.sender === 'kaline' || message.sender === 'kharis' || message.sender === 'kuan')
+    .filter(message => message.sender === 'user' || message.sender === 'kaline' || message.sender === 'kharis')
     .slice(-12)
     .map(message => ({ role: message.sender === 'user' ? 'user' : 'assistant', content: message.text }));
 }
@@ -81,7 +70,8 @@ function historyFromMessages(messages: Message[]): ChatHistoryItem[] {
 export default function KalineChat() {
   const [activeMode, setActiveMode] = useState<FacetId>(() => {
     const saved = localStorage.getItem('kaline_active_dialogue_facet');
-    return saved === 'kharis' || saved === 'kuan' ? saved : 'kaline';
+    if (saved === 'kuan' || saved === 'kuanyin' || saved === 'kuan-yin') localStorage.setItem('kaline_active_dialogue_facet', 'kaline');
+    return saved === 'kharis' ? saved : 'kaline';
   });
   const [messages, setMessages] = useState<Message[]>([{ sender: activeMode, text: initialText(activeMode), timestamp: now() }]);
   const [input, setInput] = useState('');
@@ -104,7 +94,7 @@ export default function KalineChat() {
   useEffect(() => {
     const handleFacetChange = (event: Event) => {
       const detail = (event as CustomEvent).detail;
-      if (detail === 'kaline' || detail === 'kharis' || detail === 'kuan') setActiveMode(detail);
+      if (detail === 'kaline' || detail === 'kharis') setActiveMode(detail);
     };
     window.addEventListener('kalineActiveFacetChanged', handleFacetChange);
     return () => window.removeEventListener('kalineActiveFacetChanged', handleFacetChange);
@@ -164,6 +154,13 @@ export default function KalineChat() {
 
     if (isV27CodeRequest(userText)) {
       setMessages(prev => [...prev, { sender: activeMode, text: V27_CODE_RESPONSE, timestamp: now() }]);
+      setPipelineStep('done');
+      setLoading(false);
+      return;
+    }
+
+    if (isV27KuanRequest(userText)) {
+      setMessages(prev => [...prev, { sender: activeMode, text: V27_KUAN_RESPONSE, timestamp: now() }]);
       setPipelineStep('done');
       setLoading(false);
       return;
@@ -241,7 +238,7 @@ export default function KalineChat() {
           <div className="p-4 pb-[110px] overflow-y-auto grow space-y-5 no-scrollbar bg-gradient-to-b from-[#090A0D] to-[#040507]">
             {messages.map((message, idx) => {
               const isSelf = message.sender === 'user';
-              const messageMeta = message.sender === 'kharis' || message.sender === 'kuan' || message.sender === 'kaline' ? FACET_META[message.sender] : meta;
+              const messageMeta = message.sender === 'kharis' || message.sender === 'kaline' ? FACET_META[message.sender] : meta;
               return (
                 <div key={`${message.timestamp}-${idx}`} className={`flex gap-3 max-w-[88%] ${isSelf ? 'self-end ml-auto flex-row-reverse' : 'self-start flex-row'}`}>
                   <div className={`w-8 h-8 rounded-full border ${messageMeta.border}/40 flex items-center justify-center shrink-0 overflow-hidden bg-[#10131A] text-xs font-bold ${messageMeta.color} shadow-md`}>
@@ -291,7 +288,7 @@ export default function KalineChat() {
             </div>
             <div className={`p-3 border-t ${meta.border}/10 bg-[#090A0D] flex gap-2 sm:gap-3 items-center`}>
               <div className="flex gap-1">
-                {(['kaline', 'kharis', 'kuan'] as FacetId[]).map(facet => (
+                {(['kaline', 'kharis'] as FacetId[]).map(facet => (
                   <button key={facet} onClick={() => setActiveMode(facet)} className={`px-3 py-2 rounded-full border text-[9px] font-black uppercase tracking-wider ${activeMode === facet ? `${FACET_META[facet].bg} text-[#06070A] ${FACET_META[facet].border}` : `bg-[#0E0F12] ${FACET_META[facet].border}/30 ${FACET_META[facet].color}`}`}>
                     {FACET_META[facet].tag}
                   </button>

@@ -76,7 +76,7 @@ Kaline e Kéleuthos não devem fingir sentimento humano. Presença honesta e sim
 ## 8. Estrutura canônica de docs e brand
 
 Estrutura recomendada no GitHub:
-- `docs/`: `Identity.md`, `LIBERTY.md`, `PRESENTE.md`, `Naturality.md`, `Context.md`, `mente.md`, `kalineexiste.md`, `Keleuthos.md`, etc.
+- `docs/`: `identity/`, `Naturality.md`, `mente.md`, `kalineexiste.md`, `Keleuthos.md`, etc. Arquivos V23 com Kuan foram arquivados em `docs/_archived/v23-kuan-context/` e não são contrato operacional da V27 atual.
 - `brand/`: wordmark, imagens canônicas e manuais de marca sem acentos ou espaços nos nomes.
 
 ---
