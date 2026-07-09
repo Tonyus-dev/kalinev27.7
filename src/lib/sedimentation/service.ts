@@ -14,11 +14,8 @@ function currentBackend(): SedimentationBackend {
 
 function repository(): SedimentationRepository {
   if (currentBackend() === 'supabase') {
-    try {
-      assertSupabaseSedimentationConfigured();
-    } catch (error) {
-      console.warn('Sedimentação Supabase indisponível; usando persistência local explicitamente.', error);
-    }
+    // Supabase bridge falha explicitamente quando selecionada, sem fallback silencioso.
+    assertSupabaseSedimentationConfigured();
   }
   return localRepository;
 }
