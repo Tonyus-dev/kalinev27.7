@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import { 
   Mic, Square, FileText, CheckCircle2, Clock, AlertCircle, RefreshCw, 
   ChevronRight, Download, Eye, Plus, Send, Play, BarChart2, MessageSquare, 
@@ -50,7 +49,7 @@ export function CavernaEcoPanel() {
   const [textInput, setTextInput] = useState('');
   const [textTitle, setTextTitle] = useState('');
 
-  // Recording Simulation
+  // Recording timer
   useEffect(() => {
     if (isRecording) {
       timerRef.current = setInterval(() => {
@@ -65,7 +64,6 @@ export function CavernaEcoPanel() {
   }, [isRecording]);
 
   useEffect(() => {
-    // Simulate block creation every 3 minutes (180 seconds), using 15s for demo
     if (isRecording && recordingTime > 0 && recordingTime % 15 === 0) {
       if (activeSession) {
         const newBlockIndex = activeSession.blocks.length + 1;
@@ -75,7 +73,7 @@ export function CavernaEcoPanel() {
           startTime: formatTime(recordingTime - 15),
           endTime: formatTime(recordingTime),
           status: 'transcribed',
-          transcription: 'Trecho transcrito simulado.'
+          transcription: 'Trecho de áudio registrado. Transcrição online indisponível neste ambiente.'
         };
         
         const currentBlock: Block = {
@@ -160,29 +158,7 @@ const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
           base64data = base64data.split(',')[1] || '';
 
           if (activeSession) {
-            const geminiKey = localStorage.getItem('kaline_gemini_key');
-            let transcription = "Transcrevendo...";
-            
-            if (geminiKey) {
-try {
-                const ai = new GoogleGenAI({ apiKey: geminiKey });
-                const response = await ai.models.generateContent({
-                  model: 'gemini-2.5-flash',
-                  contents: [
-                    { role: 'user', parts: [
-                      { text: "Por favor, transcreva o seguinte áudio:" },
-                      { inlineData: { mimeType: audioBlob.type || 'audio/webm', data: base64data } }
-                    ]}
-                  ]
-                });
-                transcription = response.text || "Sem transcrição.";
-              } catch(e) {
-                console.error(e);
-                transcription = "Erro na transcrição.";
-              }
-            } else {
-              transcription = "Gemini API Key não configurada. Use o Painel Guardião.";
-            }
+            const transcription = "Transcrição online indisponível: IA não configurada neste ambiente.";
 
             const finalBlocks = activeSession.blocks.map(b => 
               b.status === 'current' ? { ...b, endTime: formatTime(recordingTime), status: 'transcribed' as BlockStatus, transcription } : b
@@ -211,36 +187,17 @@ const analyzeSession = async () => {
     if (activeSession) {
       setActiveSession({ ...activeSession, status: 'analisando' });
       
-      const openRouterKey = localStorage.getItem('kaline_openrouter_key');
-      if (openRouterKey) {
-        try {
-          const textToAnalyze = activeSession.blocks.map(b => b.transcription || '').join(' ');
-          const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + openRouterKey,
-              'HTTP-Referer': 'https://kaline.app',
-              'X-Title': 'Kaline'
-            },
-            body: JSON.stringify({
-              model: 'google/gemini-pro-1.5',
-              messages: [{ role: 'user', content: 'Estruture o seguinte pensamento em tópicos organizados: ' + textToAnalyze }]
-            })
-          });
-          const data = await res.json();
-          // Simplesmente guardamos a resposta num block ou na sessao
-          // Para ser simples (Ponytail), so definimos
-          activeSession.blocks.push({ id: 'analysis', order: 99, startTime: '0', endTime: '0', status: 'transcribed', transcription: data.choices[0].message.content });
-        } catch(e) {
-           console.error(e);
-        }
-      }
+      activeSession.blocks.push({
+        id: 'analysis',
+        order: 99,
+        startTime: '0',
+        endTime: '0',
+        status: 'failed',
+        error: 'Análise online indisponível: IA não configurada neste ambiente.',
+      });
 
-      setTimeout(() => {
-        setActiveSession({ ...activeSession, status: 'analisada', isAnalyzed: true });
-        setCurrentView('analysis');
-      }, 1000);
+      setActiveSession({ ...activeSession, status: 'analisada', isAnalyzed: true });
+      setCurrentView('analysis');
     }
   };
 
