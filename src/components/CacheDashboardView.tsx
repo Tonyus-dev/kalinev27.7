@@ -95,7 +95,7 @@ export default function CacheDashboardView() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StatCard 
-            title="Semantic Cache (Local)" 
+            title="Cache Local Desativado"
             cacheType="semantic" 
             icon={Database} 
             colorClass="text-[#3B82F6]" 
@@ -121,7 +121,7 @@ export default function CacheDashboardView() {
       <div className="bg-[#0B0D12] border border-[#252936] rounded-2xl p-5 flex gap-3 text-[#A89F96]">
         <AlertTriangle className="w-5 h-5 shrink-0 text-[#FFB020]" />
         <p className="text-[10px] leading-relaxed">
-          O <strong>Semantic Cache</strong> bypassa o LLM completamente ao encontrar uma "Sedimentação" compatível via busca vetorial local simulada, reduzindo custo a zero. 
+          Não há busca vetorial local, simulação de memória ou atalho por sedimento nesta V27.
           O <strong>Prompt Cache</strong> renova o token do sistema de cache nativo da API de destino, economizando tokens de input quando a janela de contexto se mantém estável.
         </p>
       </div>
