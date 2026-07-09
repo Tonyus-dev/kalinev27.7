@@ -39,10 +39,10 @@ create table if not exists public.kaline_ledger_events (
     )
   ),
   constraint kaline_ledger_events_origin_facet_check check (
-    origin_facet in ('kaline', 'kharis')
+    origin_facet in ('kaline')
   ),
   constraint kaline_ledger_events_target_facet_check check (
-    target_facet is null or target_facet in ('kaline', 'kharis')
+    target_facet is null or target_facet in ('kaline')
   ),
   constraint kaline_ledger_events_visibility_check check (
     visibility in ('private', 'facet_only', 'shared')

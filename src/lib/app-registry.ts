@@ -31,17 +31,6 @@ export const APP_REGISTRY: Record<string, DomainRegistry> = {
       { id: 'juridico', name: 'Jurídico', description: 'Salvaguardas e contratos legais', status: 'mock', path: '/juridico' }
     ]
   },
-  kharis: {
-    id: 'kharis',
-    name: 'Kháris',
-    icon: 'BookOpen',
-    color: '#2563EB', // Azul Cuidado
-    description: 'Cuidado pessoal e pedagogia.',
-    surfaces: [
-      { id: 'codice', name: 'Códice', description: 'Documentação pedagógica e guias de rotina', status: 'mock', path: '/codice' },
-      { id: 'eco', name: 'Câmara do Eco', description: 'Ambiente acústico de foco analítico', status: 'mock', path: '/eco' }
-    ]
-  },
   drive: {
     id: 'drive',
     name: 'Drive',

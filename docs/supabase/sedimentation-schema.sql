@@ -8,7 +8,7 @@ create table if not exists public.kaline_sediments (
   text text not null,
   source text not null check (source in ('chat','manual','import')),
   status text not null check (status in ('pendente','revisado','arquivado')),
-  facet text null check (facet in ('kaline','kharis')),
+  facet text null check (facet in ('kaline')),
   tags text[] not null default '{}',
   origin jsonb null,
   created_at timestamptz not null default now(),

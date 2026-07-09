@@ -455,7 +455,7 @@ const analyzeSession = async () => {
             <h3 className="text-[10px] font-black uppercase tracking-widest text-[#A89F96] mb-4">Interlocutores</h3>
             <ul className="space-y-2 text-xs">
               <li className="flex items-center gap-2 text-[#F7EFE7]"><span className="w-1.5 h-1.5 rounded-full bg-[#FF4C1F]"></span> voz principal · <span className="text-[#A89F96]">provável</span></li>
-              <li className="flex items-center gap-2 text-[#F7EFE7]"><span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span> cliente citado · <span className="text-[#A89F96]">hipotético</span></li>
+              <li className="flex items-center gap-2 text-[#F7EFE7]"><span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span> pessoa citada · <span className="text-[#A89F96]">hipotético</span></li>
             </ul>
           </div>
 
