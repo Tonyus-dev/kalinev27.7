@@ -5,13 +5,11 @@ import {
   Monitor, 
   Share2, 
   MessageSquare, 
-  Github,
   CloudLightning,
   Smartphone,
   Laptop,
   Flame,
   Server,
-  Zap,
   Eye,
   Leaf,
   Fingerprint,
@@ -19,7 +17,7 @@ import {
   Menu,
   X,
   Shield,
-  Mic, Code,
+  Mic,
   CalendarDays,
   User,
   Database
@@ -32,26 +30,23 @@ import TailscaleShareView from './components/TailscaleShareView';
 import CacheDashboardView from './components/CacheDashboardView';
 //  from './components/TailscaleShareView';
 import KalineChat from './components/KalineChat';
-import PRPlanView from './components/PRPlanView';
 import InstallPrompt from './components/InstallPrompt';
 
 import PritaneuPanel from './components/PritaneuPanel';
 import StationPanel from './components/StationPanel';
-import ForgePanel from './components/ForgePanel';
 import MemoryPanel from './components/MemoryPanel';
 import GuardiaoPanel from './components/GuardiaoPanel';
 import AgendaPanel from './components/AgendaPanel';
 import BrandingPanel from './components/BrandingPanel';
 import PerfilPanel from './components/PerfilPanel';
 import { CavernaEcoPanel } from './components/CavernaEcoPanel';
-import CriacaoAppPanel from './components/CriacaoAppPanel';
 import HestiaStationPanel from './components/HestiaStationPanel';
 import ModoFalaPanel from './components/ModoFalaPanel';
 
 import { INITIAL_HABITS, getRelativeDateString } from './initialData';
 import { Habit, DailyLog } from './types';
 
-type TabType = 'today' | 'stats' | 'monitor' | 'tailscale' | 'kaline' | 'caverna' | 'github' | 'pritaneu' | 'station' | 'forge' | 'revisao' | 'jardim' | 'sedimentos' | 'guardiao' | 'criacao' | 'agenda' | 'perfil';
+type TabType = 'today' | 'stats' | 'monitor' | 'tailscale' | 'kaline' | 'caverna' | 'pritaneu' | 'station' | 'revisao' | 'jardim' | 'sedimentos' | 'guardiao' | 'agenda' | 'perfil';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('kaline');
@@ -218,13 +213,10 @@ export default function App() {
     { id: 'monitor', label: 'Computador', icon: Monitor, category: 'Estação' },
     { id: 'tailscale', label: 'Tailscale', icon: Share2, category: 'Estação' },
     { id: 'cache', label: 'Estação de Cache', icon: Database, category: 'Estação' },
-    { id: 'forge', label: 'Hefaístia Forge', icon: Zap, category: 'Forja' },
-    { id: 'criacao', label: 'Criador de App', icon: Code, category: 'Forja' },
     { id: 'revisao', label: 'Revisão', icon: Eye, category: 'Memória' },
     { id: 'jardim', label: 'Jardim', icon: Leaf, category: 'Memória' },
     { id: 'sedimentos', label: 'Sedimentos', icon: HelpCircle, category: 'Memória' },
     { id: 'stats', label: 'Métricas', icon: BarChart2, category: 'Análise' },
-    { id: 'github', label: 'Planos PRs', icon: Github, category: 'Análise' },
   ] as const;
 
   return (
@@ -364,11 +356,8 @@ export default function App() {
           {activeTab === 'perfil' && <PerfilPanel />}
           {activeTab === 'pritaneu' && <PritaneuPanel onNavigateTab={(tab) => setActiveTab(tab as TabType)} />}
           {activeTab === 'station' && <StationPanel />}
-          {activeTab === 'forge' && <ForgePanel />}
-          {activeTab === 'criacao' && <CriacaoAppPanel />}
           {activeTab === 'station' && <HestiaStationPanel />}
           {activeTab === 'fala' && <ModoFalaPanel onClose={() => setActiveTab('kaline')} />}
-          {activeTab === 'github' && <PRPlanView />}
           {activeTab === 'revisao' && <MemoryPanel subTab="revisao" />}
           {activeTab === 'jardim' && <MemoryPanel subTab="jardim" />}
           {activeTab === 'sedimentos' && <MemoryPanel subTab="sedimentos" />}

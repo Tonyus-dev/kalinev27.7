@@ -190,7 +190,7 @@ export default function PritaneuPanel({ onNavigateTab }: PritaneuPanelProps) {
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-base font-black uppercase text-[#FF4C1F]">Hefaístia Forge</h3>
+              <h3 className="text-base font-black uppercase text-[#FF4C1F]">Forja Local</h3>
               <p className="text-[11px] text-[#A89F96] leading-relaxed">
                 Motor e forjador local de IA. Executa benchmarks de tokens por segundo e orquestra tarefas estruturadas locais no Ollama.
               </p>
@@ -205,7 +205,7 @@ export default function PritaneuPanel({ onNavigateTab }: PritaneuPanelProps) {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-1.5"><Layers className="w-3.5 h-3.5 text-orange-500" /> Modelo Ativo:</span>
                 <span className="text-orange-400 font-bold truncate max-w-[120px] text-right">
-                  {forge?.currentModel || 'qwen2.5-coder'}
+                  {forge?.currentModel || 'modelo-local'}
                 </span>
               </div>
             </div>

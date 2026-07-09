@@ -8,7 +8,10 @@ export default function GuardiaoPanel() {
   const [sttModel, setSttModel] = useState('google/gemini-2.5-flash-lite');
   const [sttFallback, setSttFallback] = useState('openai/whisper-large-v3');
 
-  const [activeDialogueFacet, setActiveDialogueFacet] = useState(() => localStorage.getItem('kaline_active_dialogue_facet') || 'kora');
+  const [activeDialogueFacet, setActiveDialogueFacet] = useState(() => {
+    const saved = localStorage.getItem('kaline_active_dialogue_facet');
+    return saved === 'kharis' || saved === 'kuan' ? saved : 'kaline';
+  });
 
   const [promptCaching, setPromptCaching] = useState(() => localStorage.getItem('kaline_prompt_caching') !== 'false');
   const [semanticCaching, setSemanticCaching] = useState(() => localStorage.getItem('kaline_semantic_caching') === 'true');
@@ -153,9 +156,9 @@ export default function GuardiaoPanel() {
               }}
               className="w-full text-xs px-3 py-2.5 bg-[#10131A] border border-[#252936] rounded-lg focus:outline-none focus:border-[#FF4C1F] text-[#F7EFE7]"
             >
-              <option value="kora">Kora / Kaline (Naturalidade e Presença)</option>
+              <option value="kaline">Kaline (Naturalidade e Presença)</option>
               <option value="kharis">Kháris (Cuidado, Simplicidade e Gentileza)</option>
-              <option value="klio">Klio (Pensamento e Programação Técnica)</option>
+              <option value="kuan">Kuan (Comercial e Atendimento)</option>
             </select>
             <p className="text-[8px] text-[#A89F96]">
               O administrador escolhe com qual faceta da Kaline os outros usuários podem conversar.

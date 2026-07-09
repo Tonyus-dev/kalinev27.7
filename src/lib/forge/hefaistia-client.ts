@@ -55,16 +55,16 @@ export async function fetchHefaistiaStatus(baseUrl: string = DEFAULT_URL): Promi
   return {
     online: false,
     ollamaOnline: true,
-    currentModel: 'qwen2.5-coder:7b',
+    currentModel: 'modelo-local:7b',
     localModels: [
-      { name: 'qwen2.5-coder:7b', size: '4.7 GB', parameterCount: '7.2B', quantization: 'Q4_K_M', status: 'active' },
+      { name: 'modelo-local:7b', size: '4.7 GB', parameterCount: '7.2B', quantization: 'Q4_K_M', status: 'active' },
       { name: 'qwen2.5:1.5b', size: '986 MB', parameterCount: '1.5B', quantization: 'Q4_K_M', status: 'downloaded' },
       { name: 'qwen2.5:3b', size: '1.9 GB', parameterCount: '3.1B', quantization: 'Q4_K_M', status: 'downloaded' },
       { name: 'qwen2.5:0.5b', size: '394 MB', parameterCount: '0.5B', quantization: 'Q4_K_M', status: 'not_installed' }
     ],
     benchmark: {
       lastTest: '05:31',
-      model: 'qwen2.5-coder:7b',
+      model: 'modelo-local:7b',
       tps: 34.2,
       latencyMs: 125,
       ramUsed: '5.2 GB'
