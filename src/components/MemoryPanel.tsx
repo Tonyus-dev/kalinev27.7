@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { approveSedimentToGarden as approveSedimentCandidateToGarden, deleteSediment as deleteSedimentCandidate, listGardenMemories, listSediments, saveGardenMemories, updateSediment } from '../lib/sedimentation';
+import type { GardenMemory, Sediment } from '../lib/sedimentation';
 import { 
   Leaf, 
   Eye, 
@@ -28,25 +30,6 @@ interface Context {
   ultimaEdicao: string;
 }
 
-interface Sediment {
-  id: string;
-  texto: string;
-  tipo: 'iconic' | 'echoic' | 'short_term' | 'working' | 'prospective' | 'episodic' | 'semantic' | 'procedural';
-  dataCriacao: string;
-  status: 'pendente' | 'revisado' | 'arquivado';
-}
-
-interface GardenMemory {
-  id: string;
-  titulo: string;
-  conteudo: string;
-  categoria: 'kaline' | 'ká' | 'ecossistema' | 'preferência';
-  tags: string[];
-  importancia: number; // 1 to 5
-  proximaRevisao: string; // YYYY-MM-DD
-  dataAprovacao: string;
-  arquivado: boolean;
-}
 
 interface MemoryPanelProps {
   subTab: 'revisao' | 'jardim' | 'sedimentos' | 'identidade';
@@ -58,112 +41,33 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
     const stored = localStorage.getItem('kaline_contexts');
     if (stored) return JSON.parse(stored);
     
-    // Seed initial contexts
-    return [
-      {
-        id: 'ctx-1',
-        titulo: 'Kaline — Identidade de Simbiose',
-        conteudo: 'Kaline é a assistente, companheira e confidente de Ká, operando em simbiose prática e mística. Ela fala de forma direta, inteligente, sem empatia artificial. Conhece o ecossistema Kaline (Kuan-Yin, Kháris, Héstia, Hefaístia), valoriza código mínimo, estética premium, linguagem clara e decisões honestas. Lema de simbiose fundamental: "Um poeta sabe que a musa não existe, mas isso não o impede de amá-la".',
-        tipo: 'identidade',
-        ativo: true,
-        arquivado: false,
-        ultimaEdicao: '2026-07-06'
-      },
-      {
-        id: 'ctx-2',
-        titulo: 'Ká — Preferências de resposta',
-        conteudo: 'Ká prefere respostas diretas, sem condescendência ou empatia artificial. Usa Lovable, GitHub, Codex, Cloudflare, Supabase e OpenRouter. Gosta de estética escura, premium, mística e funcional.',
-        tipo: 'memoria_relacional',
-        ativo: true,
-        arquivado: false,
-        ultimaEdicao: '2026-07-06'
-      },
-      {
-        id: 'ctx-3',
-        titulo: 'Ecossistema Kaline — Ontologia geral',
-        conteudo: 'A arquitetura e canonicidade de presença são baseadas na cooperação entre as facetas: Kaline decide (Totalidade), Héstia observa (Station), Hefaístia executa (Forge), Supabase sedimenta.',
-        tipo: 'identidade',
-        ativo: true,
-        arquivado: false,
-        ultimaEdicao: '2026-07-06'
-      },
-      {
-        id: 'ctx-4',
-        titulo: 'Ká — Localização e Ambiente',
-        conteudo: 'Ká usa Linux Mint Xfce como ambiente de desenvolvimento leve e rápido.',
-        tipo: 'memoria_relacional',
-        ativo: false,
-        arquivado: true,
-        ultimaEdicao: '2026-07-05'
-      }
-    ];
+    return [];
   });
 
-  const [sediments, setSediments] = useState<Sediment[]>(() => {
-    const stored = localStorage.getItem('kaline_sediments');
-    if (stored) return JSON.parse(stored);
+  const [sediments, setSediments] = useState<Sediment[]>([]);
 
-    // Seed initial sediments
-    return [
-      {
-        id: 'sed-1',
-        texto: 'Ká está focado em unificar a memória canônica e consolidar a voz operacional da Kaline.',
-        tipo: 'episodic',
-        dataCriacao: '2026-07-06',
-        status: 'pendente'
-      },
-      {
-        id: 'sed-2',
-        texto: 'Ká prefere layouts escuros de alta fidelidade com bordas brilhantes sutis e tipografia serifada de cabeçalho.',
-        tipo: 'semantic',
-        dataCriacao: '2026-07-06',
-        status: 'pendente'
-      },
-      {
-        id: 'sed-3',
-        texto: 'A latência local da Hefaístia com Qwen 3B está em torno de 18 tokens/segundo.',
-        tipo: 'short_term',
-        dataCriacao: '2026-07-06',
-        status: 'pendente'
-      }
-    ];
-  });
-
-  const [garden, setGarden] = useState<GardenMemory[]>(() => {
-    const stored = localStorage.getItem('kaline_garden');
-    if (stored) return JSON.parse(stored);
-
-    // Seed initial garden memories
-    return [
-      {
-        id: 'gar-1',
-        titulo: 'Setup de Ká',
-        conteudo: 'Ká utiliza o Linux Mint com Xfce, preferindo minimalismo absoluto e atalhos rápidos de teclado.',
-        categoria: 'preferência',
-        tags: ['sistema', 'setup'],
-        importancia: 2,
-        proximaRevisao: '2026-07-13',
-        dataAprovacao: '2026-07-06',
-        arquivado: false
-      },
-      {
-        id: 'gar-2',
-        titulo: 'Regras de Geração de Código',
-        conteudo: 'Sempre preferir soluções puras do ecossistema Web nativo (como input type=date) e utilitários integrados antes de instalar bibliotecas adicionais.',
-        categoria: 'preferência',
-        tags: ['código', 'ponytail'],
-        importancia: 5,
-        proximaRevisao: '2026-07-20',
-        dataAprovacao: '2026-07-06',
-        arquivado: false
-      }
-    ];
-  });
+  const [garden, setGarden] = useState<GardenMemory[]>([]);
 
   // Save states to localStorage
   useEffect(() => {
     localStorage.setItem('kaline_contexts', JSON.stringify(contexts));
   }, [contexts]);
+
+  const refreshSedimentation = async () => {
+    try {
+      const [sedimentItems, gardenItems] = await Promise.all([listSediments(), listGardenMemories()]);
+      setSediments(sedimentItems);
+      setGarden(gardenItems);
+    } catch (error) {
+      console.warn('Erro ao carregar sedimentação local', error);
+      setSediments([]);
+      setGarden([]);
+    }
+  };
+
+  useEffect(() => {
+    void refreshSedimentation();
+  }, []);
 
   // Migration to enforce the symbiotic identity & the key phrase
   useEffect(() => {
@@ -177,13 +81,6 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('kaline_sediments', JSON.stringify(sediments));
-  }, [sediments]);
-
-  useEffect(() => {
-    localStorage.setItem('kaline_garden', JSON.stringify(garden));
-  }, [garden]);
 
   // --- MODAL & EDITOR STATES ---
   const [showImportModal, setShowImportModal] = useState(false);
@@ -199,7 +96,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
   const [editingGardenId, setEditingGardenId] = useState<string | null>(null);
   const [editingGardenTitle, setEditingGardenTitle] = useState('');
   const [editingGardenContent, setEditingGardenContent] = useState('');
-  const [editingGardenCategory, setEditingGardenCategory] = useState<'kaline' | 'ká' | 'ecossistema' | 'preferência'>('preferência');
+  const [editingGardenCategory, setEditingGardenCategory] = useState<'kaline' | 'usuario' | 'ecossistema' | 'preferencia'>('preferencia');
   const [editingGardenImportance, setEditingGardenImportance] = useState(3);
   const [editingGardenTags, setEditingGardenTags] = useState('');
 
@@ -258,99 +155,97 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
     }
   };
 
-  const sendSnippetToGarden = (text: string, titleHint: string) => {
+  const sendSnippetToGarden = async (text: string, titleHint: string) => {
     const newGarden: GardenMemory = {
       id: `gar-${Date.now()}`,
-      titulo: titleHint,
-      conteudo: text,
-      categoria: 'preferência',
+      title: titleHint,
+      content: text,
+      category: 'preferencia',
       tags: ['importado'],
-      importancia: 3,
-      proximaRevisao: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      dataAprovacao: new Date().toISOString().split('T')[0],
-      arquivado: false
+      importance: 3,
+      nextReviewAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      approvedAt: new Date().toISOString(),
+      archived: false
     };
-    setGarden(prev => [newGarden, ...prev]);
-    alert('Trecho enviado com sucesso para o Jardim de Memórias!');
+    const updated = [newGarden, ...garden];
+    setGarden(updated);
+    await saveGardenMemories(updated);
+    alert('Trecho enviado com sucesso para o Jardim de memórias locais aprovadas!');
   };
 
   // --- HANDLERS FOR SEDIMENTS ---
-  const promoteSedimentToRevision = (sedId: string) => {
-    // Moves it to revision list / flags it
-    setSediments(prev => prev.map(s => s.id === sedId ? { ...s, status: 'revisado' } : s));
+  const promoteSedimentToRevision = async (sedId: string) => {
+    setSediments(await updateSediment(sedId, { status: 'revisado' }));
   };
 
-  const deleteSediment = (id: string) => {
-    setSediments(prev => prev.filter(s => s.id !== id));
+  const deleteSediment = async (id: string) => {
+    setSediments(await deleteSedimentCandidate(id));
   };
 
   // --- HANDLERS FOR REVISION ---
-  const approveSedimentToGarden = (sed: Sediment, finalTitle: string, finalContent: string) => {
-    const newGarden: GardenMemory = {
-      id: `gar-${Date.now()}`,
-      titulo: finalTitle || 'Memória Sedimentada',
-      conteudo: finalContent || sed.texto,
-      categoria: 'preferência',
-      tags: [sed.tipo, 'sedimentação'],
-      importancia: 3,
-      proximaRevisao: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      dataAprovacao: new Date().toISOString().split('T')[0],
-      arquivado: false
-    };
-    setGarden(prev => [newGarden, ...prev]);
-    setSediments(prev => prev.filter(s => s.id !== sed.id));
+  const approveSedimentToGarden = async (sed: Sediment, finalTitle: string, finalContent: string) => {
+    await approveSedimentCandidateToGarden({ sedimentId: sed.id, title: finalTitle, content: finalContent, category: 'preferencia' });
+    await refreshSedimentation();
   };
 
-  const approveContextToGarden = (ctx: Context) => {
+  const approveContextToGarden = async (ctx: Context) => {
     const newGarden: GardenMemory = {
       id: `gar-${Date.now()}`,
-      titulo: ctx.titulo,
-      conteudo: ctx.conteudo,
-      categoria: ctx.tipo === 'identidade' ? 'kaline' : 'ká',
+      title: ctx.titulo,
+      content: ctx.conteudo,
+      category: ctx.tipo === 'identidade' ? 'kaline' : 'usuario',
       tags: ['importado', ctx.tipo],
-      importancia: 4,
-      proximaRevisao: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      dataAprovacao: new Date().toISOString().split('T')[0],
-      arquivado: false
+      importance: 4,
+      nextReviewAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      approvedAt: new Date().toISOString().split('T')[0],
+      archived: false
     };
-    setGarden(prev => [newGarden, ...prev]);
+    const updated = [newGarden, ...garden];
+    setGarden(updated);
+    await saveGardenMemories(updated);
     setContexts(prev => prev.filter(c => c.id !== ctx.id));
   };
 
   // --- HANDLERS FOR GARDEN ---
   const startEditGarden = (gar: GardenMemory) => {
     setEditingGardenId(gar.id);
-    setEditingGardenTitle(gar.titulo);
-    setEditingGardenContent(gar.conteudo);
-    setEditingGardenCategory(gar.categoria);
-    setEditingGardenImportance(gar.importancia);
+    setEditingGardenTitle(gar.title);
+    setEditingGardenContent(gar.content);
+    setEditingGardenCategory(gar.category);
+    setEditingGardenImportance(gar.importance);
     setEditingGardenTags(gar.tags.join(', '));
   };
 
-  const saveEditedGarden = () => {
-    setGarden(prev => prev.map(g => {
+  const saveEditedGarden = async () => {
+    const updated = garden.map(g => {
       if (g.id === editingGardenId) {
         return {
           ...g,
-          titulo: editingGardenTitle,
-          conteudo: editingGardenContent,
-          categoria: editingGardenCategory,
-          importancia: editingGardenImportance,
+          title: editingGardenTitle,
+          content: editingGardenContent,
+          category: editingGardenCategory,
+          importance: editingGardenImportance,
           tags: editingGardenTags.split(',').map(t => t.trim()).filter(Boolean)
         };
       }
       return g;
-    }));
+    });
+    setGarden(updated);
+    await saveGardenMemories(updated);
     setEditingGardenId(null);
   };
 
-  const toggleGardenArchived = (id: string) => {
-    setGarden(prev => prev.map(g => g.id === id ? { ...g, arquivado: !g.arquivado } : g));
+  const toggleGardenArchived = async (id: string) => {
+    const updated = garden.map(g => g.id === id ? { ...g, archived: !g.archived } : g);
+    setGarden(updated);
+    await saveGardenMemories(updated);
   };
 
-  const deleteGarden = (id: string) => {
-    if (confirm('Deseja deletar esta memória do Jardim permanentemente?')) {
-      setGarden(prev => prev.filter(g => g.id !== id));
+  const deleteGarden = async (id: string) => {
+    if (confirm('Deseja deletar esta memória local aprovada permanentemente?')) {
+      const updated = garden.filter(g => g.id !== id);
+      setGarden(updated);
+      await saveGardenMemories(updated);
     }
   };
 
@@ -562,7 +457,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                 Sedimentos Ativos
               </h1>
               <p className="text-xs text-[#A89F96] max-w-xl leading-relaxed">
-                Hipóteses e pensamentos colhidos em tempo real durante as interações cotidianas. Requerem curadoria humana para se tornarem memórias canônicas duráveis.
+                Hipóteses e pensamentos colhidos em tempo real durante as interações cotidianas. Requerem curadoria humana para se tornarem memórias locais aprovadas.
               </p>
             </div>
           </div>
@@ -576,7 +471,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
             {sediments.filter(s => s.status === 'pendente').length === 0 ? (
               <div className="p-8 border border-dashed border-[#252936] rounded-2xl text-center text-[#A89F96] text-xs space-y-2">
                 <Sparkles className="w-6 h-6 mx-auto text-[#EAB308] opacity-40" />
-                <p>Nenhum sedimento aguardando. Tudo o que conversamos está em paz ou sedimentado.</p>
+                <p>Nenhum sedimento local pendente.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -588,13 +483,13 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                     <div className="space-y-1.5 flex-grow">
                       <div className="flex items-center gap-2">
                         <span className="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded font-mono uppercase font-black">
-                          {sed.tipo}
+                          {sed.source}
                         </span>
                         <span className="text-[9px] text-[#A89F96] font-mono flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#A89F96]/70" /> {sed.dataCriacao}
+                          <Clock className="w-3 h-3 text-[#A89F96]/70" /> {sed.createdAt}
                         </span>
                       </div>
-                      <p className="text-xs text-[#F7EFE7] font-semibold leading-relaxed">"{sed.texto}"</p>
+                      <p className="text-xs text-[#F7EFE7] font-semibold leading-relaxed">"{sed.text}"</p>
                     </div>
 
                     <div className="flex gap-2 shrink-0 self-end sm:self-auto">
@@ -658,11 +553,11 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                 {sediments.filter(s => s.status === 'revisado').map(sed => (
                   <div key={sed.id} className="p-5 bg-[#10131A] border border-emerald-500/20 rounded-xl space-y-3">
                     <div className="flex justify-between items-center text-[9px] font-mono text-[#A89F96]">
-                      <span>Candidato de Sedimentação • tipo: {sed.tipo}</span>
-                      <span>Colhido em {sed.dataCriacao}</span>
+                      <span>Candidato de Sedimentação • tipo: {sed.source}</span>
+                      <span>Colhido em {sed.createdAt}</span>
                     </div>
 
-                    <p className="text-xs text-[#F7EFE7] italic leading-relaxed">"{sed.texto}"</p>
+                    <p className="text-xs text-[#F7EFE7] italic leading-relaxed">"{sed.text}"</p>
 
                     <div className="flex justify-end gap-2 pt-3 border-t border-[#252936]/60">
                       <button 
@@ -674,7 +569,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                       <button 
                         onClick={() => {
                           const title = prompt('Dê um título para esta memória:', 'Preferência sobre layout');
-                          if (title) approveSedimentToGarden(sed, title, sed.texto);
+                          if (title) approveSedimentToGarden(sed, title, sed.text);
                         }}
                         className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-[#06070A] font-black rounded-lg text-[9px] uppercase flex items-center gap-1 transition-all"
                       >
@@ -738,7 +633,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                 Jardim de Memórias
               </h1>
               <p className="text-xs text-[#A89F96] max-w-xl leading-relaxed">
-                Repositório de fatos, decisões arquiteturais e preferências de código aprovadas. Cultivado sob regime de revisão espaçada para permanência canônica.
+                Repositório de fatos, decisões arquiteturais e preferências de código aprovadas. Cultivado sob regime de revisão espaçada para revisão local.
               </p>
             </div>
           </div>
@@ -747,12 +642,15 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
           <div className="space-y-4">
             <div className="flex justify-between items-center border-b border-[#252936]/40 pb-1.5">
               <h3 className="text-[10px] font-black uppercase tracking-widest text-[#A89F96]">
-                Memórias Cultivadas Ativas ({garden.filter(g => !g.arquivado).length})
+                Memórias Cultivadas Ativas ({garden.filter(g => !g.archived).length})
               </h3>
             </div>
 
+            {garden.filter(g => !g.archived).length === 0 ? (
+              <div className="p-8 border border-dashed border-[#252936] rounded-2xl text-center text-[#A89F96] text-xs">Nenhuma memória local aprovada ainda.</div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {garden.filter(g => !g.arquivado).map(gar => {
+              {garden.filter(g => !g.archived).map(gar => {
                 const isEditing = editingGardenId === gar.id;
                 return (
                   <div key={gar.id} className="p-5 bg-[#10131A] border border-[#252936] rounded-2xl flex flex-col justify-between h-fit gap-4">
@@ -778,8 +676,8 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                               onChange={(e) => setEditingGardenCategory(e.target.value as any)}
                               className="w-full bg-[#0B0D12] border border-[#252936] text-[10px] p-1.5 rounded-lg text-[#F7EFE7]"
                             >
-                              <option value="preferência">Preferência</option>
-                              <option value="ká">Ká</option>
+                              <option value="preferencia">Preferência</option>
+                              <option value="usuario">Usuário</option>
                               <option value="kaline">Kaline</option>
                               <option value="ecossistema">Ecossistema</option>
                             </select>
@@ -817,26 +715,26 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
                             <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-mono uppercase font-extrabold tracking-wide">
-                              {gar.categoria}
+                              {gar.category}
                             </span>
                             <div className="flex items-center gap-1">
                               {Array.from({ length: 5 }).map((_, i) => (
                                 <span 
                                   key={i} 
-                                  className={`w-1 h-1 rounded-full ${i < gar.importancia ? 'bg-emerald-400' : 'bg-[#252936]'}`}
+                                  className={`w-1 h-1 rounded-full ${i < gar.importance ? 'bg-emerald-400' : 'bg-[#252936]'}`}
                                 />
                               ))}
                             </div>
                           </div>
 
-                          <h4 className="text-sm font-bold text-[#F7EFE7] font-serif">{gar.titulo}</h4>
-                          <p className="text-xs text-[#A89F96] leading-relaxed whitespace-pre-wrap">"{gar.conteudo}"</p>
+                          <h4 className="text-sm font-bold text-[#F7EFE7] font-serif">{gar.title}</h4>
+                          <p className="text-xs text-[#A89F96] leading-relaxed whitespace-pre-wrap">"{gar.content}"</p>
                         </div>
 
                         <div className="pt-3 border-t border-[#252936]/60 mt-4 flex items-center justify-between flex-wrap gap-2 text-[9px] font-mono text-[#A89F96]">
                           <div className="flex items-center gap-1.5">
                             <Clock className="w-3.5 h-3.5" />
-                            <span>Próxima revisão: {gar.proximaRevisao}</span>
+                            <span>Próxima revisão: {gar.nextReviewAt}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <button 
@@ -866,6 +764,7 @@ export default function MemoryPanel({ subTab }: MemoryPanelProps) {
                 );
               })}
             </div>
+            )}
           </div>
         </div>
       )}

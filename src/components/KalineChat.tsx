@@ -2,6 +2,8 @@ import { GoogleGenAI } from '@google/genai';
 import React, { useState, useRef, useEffect } from 'react';
 import { cacheStatsTracker } from '../lib/CacheStatsTracker';
 import { buildIdentityContext, isV27CodeRequest, V27_CODE_RESPONSE } from '../lib/identityDocs';
+import { addSedimentCandidate, listSediments } from '../lib/sedimentation';
+import type { Sediment } from '../lib/sedimentation';
 import KittScanner, { KittState } from './KittScanner';
 import { 
   Sparkles, 
@@ -48,13 +50,7 @@ interface Message {
   semanticCached?: boolean;
 }
 
-interface Sediment {
-  id: string;
-  texto: string;
-  tipo: 'iconic' | 'echoic' | 'short_term' | 'working' | 'prospective' | 'episodic' | 'semantic' | 'procedural';
-  dataCriacao: string;
-  status: 'pendente' | 'revisado' | 'arquivado';
-}
+
 
 export const PRESENCA_META = {
   green: {
@@ -390,28 +386,13 @@ export default function KalineChat() {
     }
   };
 
-  // Load and sync sediments
-  const loadSediments = () => {
+  // Load and sync sediments through the sedimentation service.
+  const loadSediments = async () => {
     try {
-      const stored = localStorage.getItem('kaline_sediments');
-      if (stored) {
-        setSediments(JSON.parse(stored));
-      } else {
-        // Default initial seed if empty
-        const initial = [
-          {
-            id: 'sed-1',
-            texto: 'Ká está focando em arquitetura server-side utilizando Cloudflare Workers e Supabase',
-            tipo: 'short_term' as const,
-            dataCriacao: new Date().toISOString().split('T')[0],
-            status: 'pendente' as const
-          }
-        ];
-        localStorage.setItem('kaline_sediments', JSON.stringify(initial));
-        setSediments(initial);
-      }
+      setSediments(await listSediments());
     } catch (e) {
-      console.warn(e);
+      console.warn('Erro ao ler sedimentos locais', e);
+      setSediments([]);
     }
   };
 
@@ -545,10 +526,10 @@ const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   useEffect(() => {
     loadActiveContexts();
-    loadSediments();
+    void loadSediments();
     const interval = setInterval(() => {
       loadActiveContexts();
-      loadSediments();
+      void loadSediments();
     }, 1500);
     return () => clearInterval(interval);
   }, []);
@@ -576,8 +557,6 @@ const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const processMessage = async (userText: string) => {
     setLoading(true);
 
-    const isSemanticCachingEnabled = localStorage.getItem('kaline_semantic_caching') === 'true';
-
     const lowerText = userText.toLowerCase();
 
     if (isV27CodeRequest(userText)) {
@@ -594,47 +573,7 @@ const mediaRecorderRef = useRef<MediaRecorder | null>(null);
       return;
     }
 
-    // Local sediment lookup. This is localStorage only, not semantic memory or vector search.
-    if (isSemanticCachingEnabled) {
-      try {
-        const storedSed = localStorage.getItem('kaline_sediments');
-        const sediments = storedSed ? JSON.parse(storedSed) : [];
-        const matchingSediment = sediments.find((s: any) => 
-          (s.titulo && lowerText.includes(s.titulo.toLowerCase())) || 
-          (s.tags && s.tags.some((t: string) => lowerText.includes(t.toLowerCase())))
-        );
 
-        if (!matchingSediment) {
-          cacheStatsTracker.recordMiss('semantic');
-        }
-        if (matchingSediment) {
-          setPipelineStep('filtering');
-          setTempFiltered(`[Sedimento local] Recuperando registro local revisável`);
-          cacheStatsTracker.recordHit('semantic', 0.0002);
-          setPipelineStep('generating');
-
-          let responseText = `**[Sedimento local]**\nRecuperei este registro local revisável, sem tratar como identidade canônica ou banco vetorial:\n\n**${matchingSediment.titulo}**\n${matchingSediment.conteudo}`;
-          if (matchingSediment.tags && matchingSediment.tags.length > 0) {
-            responseText += `\n\n*Tags: ${matchingSediment.tags.join(', ')}*`;
-          }
-
-          setMessages(prev => [
-            ...prev,
-            {
-              sender: activeMode,
-              text: responseText,
-              timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-              semanticCached: true
-            }
-          ]);
-          setLoading(false);
-          setPipelineStep('idle');
-          return;
-        }
-      } catch (e) {
-        console.warn('Erro ao ler sedimentos locais', e);
-      }
-    }
 
     setPipelineStep('filtering');
     setTempFiltered('');
@@ -845,7 +784,7 @@ Por favor, responda ao pedido estruturado baseando-se estritamente nos contextos
     setLoading(false);
 
     if (userText.length > 25) {
-      saveSedimentCandidate(userText);
+      void saveSedimentCandidate(userText);
     }
   };
 
@@ -865,36 +804,22 @@ Por favor, responda ao pedido estruturado baseando-se estritamente nos contextos
     setPipelineStep('done');
   };
 
-  const saveSedimentCandidate = (text: string) => {
+  const saveSedimentCandidate = async (text: string) => {
     try {
-      const stored = localStorage.getItem('kaline_sediments');
-      const parsed = stored ? JSON.parse(stored) : [];
-      if (parsed.some((s: any) => s.texto === text)) return;
-      
-      const newSed: Sediment = {
-        id: `sed-${Date.now()}`,
-        texto: `Ká mencionou durante o chat: "${text}"`,
-        tipo: 'short_term',
-        dataCriacao: new Date().toISOString().split('T')[0],
-        status: 'pendente'
-      };
-      const updated = [newSed, ...parsed];
-      localStorage.setItem('kaline_sediments', JSON.stringify(updated));
-      setSediments(updated);
+      await addSedimentCandidate({
+        text,
+        source: 'chat',
+        origin: {
+          type: 'chat',
+          facet: activeMode,
+        },
+      });
+      await loadSediments();
     } catch (e) {
       console.warn('Erro ao salvar sedimento de conversa', e);
     }
   };
 
-  const promoteSediment = (id: string) => {
-    try {
-      const updated = sediments.map(s => s.id === id ? { ...s, status: 'revisado' as const } : s);
-      localStorage.setItem('kaline_sediments', JSON.stringify(updated));
-      setSediments(updated);
-    } catch (e) {
-      console.warn(e);
-    }
-  };
 
   
   useEffect(() => {
@@ -928,15 +853,6 @@ Por favor, responda ao pedido estruturado baseando-se estritamente nos contextos
     });
   }, [activeMode]);
 
-  const discardSediment = (id: string) => {
-    try {
-      const updated = sediments.filter(s => s.id !== id);
-      localStorage.setItem('kaline_sediments', JSON.stringify(updated));
-      setSediments(updated);
-    } catch (e) {
-      console.warn(e);
-    }
-  };
 
   const getKittState = (): KittState => {
     if (isListening) return "listening";

@@ -1066,7 +1066,7 @@ A regra é:
 4. ação pendente e autorização ainda válida;
 5. contexto de sessão ativo;
 6. procedimento confirmado relevante;
-7. memória semântica confirmada relevante;
+7. memória aprovada confirmada relevante;
 8. relação confirmada relevante;
 9. episódio relevante;
 10. working ativo;
