@@ -1,6 +1,6 @@
 export type SedimentStatus = "pendente" | "revisado" | "arquivado";
 export type SedimentSource = "chat" | "manual" | "import";
-export type FacetId = "kaline" | "kharis" | "kuan";
+export type FacetId = "kaline";
 export type GardenCategory = "kaline" | "usuario" | "ecossistema" | "preferencia";
 
 export type SedimentOrigin = {

@@ -285,7 +285,7 @@ export default function TailscaleShareView() {
               <span className="w-5 h-5 rounded-lg bg-indigo-800 text-white flex items-center justify-center font-mono font-bold text-[10px] shrink-0">1</span>
               <div>
                 <h4 className="text-xs font-bold text-white">Instale o aplicativo</h4>
-                <p className="text-[10px] text-indigo-200 leading-relaxed">Instale o cliente oficial do Tailscale em ambos os dispositivos (Chrome/Windows/macOS/Linux e iOS App Store).</p>
+                <p className="text-[10px] text-indigo-200 leading-relaxed">Instale o app oficial do Tailscale em ambos os dispositivos (Chrome/Windows/macOS/Linux e iOS App Store).</p>
               </div>
             </div>
 

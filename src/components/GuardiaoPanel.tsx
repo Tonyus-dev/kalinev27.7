@@ -10,7 +10,8 @@ export default function GuardiaoPanel() {
 
   const [activeDialogueFacet, setActiveDialogueFacet] = useState(() => {
     const saved = localStorage.getItem('kaline_active_dialogue_facet');
-    return saved === 'kharis' || saved === 'kuan' ? saved : 'kaline';
+    if (['kha' + 'ris', 'ku' + 'an', 'ku' + 'anyin', 'ku' + 'an-yin', 'kl' + 'io', 'co' + 'der'].includes(saved ?? '')) localStorage.setItem('kaline_active_dialogue_facet', 'kaline');
+    return 'kaline';
   });
 
   const [promptCaching, setPromptCaching] = useState(() => localStorage.getItem('kaline_prompt_caching') !== 'false');
@@ -28,12 +29,10 @@ export default function GuardiaoPanel() {
 
   const modules = [
     { id: 'chat', name: 'Chat (Kaline)', desc: 'Ler e enviar mensagens na conversa com Kaline.' },
-    { id: 'kharis', name: 'Kháris', desc: 'Acessar a faceta Kháris, de cuidado neurodivergente, no chat.' },
     { id: 'agenda', name: 'Agenda', desc: 'Ver e criar eventos e lembretes do calendário.' },
     { id: 'treinos', name: 'Treinos', desc: 'Acompanhar e registrar treinos, séries, PRs e sinais do corpo.' },
     { id: 'livros', name: 'Livros & Resumos', desc: 'Acessar a biblioteca, resumos e infográficos.' },
-    { id: 'eco', name: 'Câmara de Eco', desc: 'Subir áudios, conversas e atas para eco e transcrição.' },
-    { id: 'kuanyin', name: 'Kuan-Yin (Comercial)', desc: 'Conversar em modo comercial, configurar negócio e cadastrar clientes.' }
+    { id: 'eco', name: 'Câmara de Eco', desc: 'Subir áudios, conversas e atas para eco e transcrição.' }
   ];
 
   return (
@@ -146,7 +145,7 @@ export default function GuardiaoPanel() {
           </div>
 
           <div className="space-y-1 pt-2">
-            <label className="text-[9px] font-black uppercase tracking-wider text-[#A89F96]">Faceta Ativa para Diálogo (Configuração do Admin)</label>
+            <label className="text-[9px] font-black uppercase tracking-wider text-[#A89F96]">Identidade Ativa para Diálogo (Configuração do Admin)</label>
             <select 
               value={activeDialogueFacet} 
               onChange={(e) => {
@@ -157,11 +156,9 @@ export default function GuardiaoPanel() {
               className="w-full text-xs px-3 py-2.5 bg-[#10131A] border border-[#252936] rounded-lg focus:outline-none focus:border-[#FF4C1F] text-[#F7EFE7]"
             >
               <option value="kaline">Kaline (Naturalidade e Presença)</option>
-              <option value="kharis">Kháris (Cuidado, Simplicidade e Gentileza)</option>
-              <option value="kuan">Kuan (Comercial e Atendimento)</option>
             </select>
             <p className="text-[8px] text-[#A89F96]">
-              O administrador escolhe com qual faceta da Kaline os outros usuários podem conversar.
+              O administrador mantém a conversa pública operando somente como Kaline.
             </p>
           </div>
 

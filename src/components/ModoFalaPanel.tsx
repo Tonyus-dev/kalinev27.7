@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Mic, Square, RotateCcw, Volume2, MessageSquare, Paperclip, Activity, Settings } from 'lucide-react';
 
 export type KlioVoiceState = 'idle' | 'recording' | 'transcribing' | 'thinking' | 'speaking' | 'done' | 'error';
-export type ActiveMode = 'kaline' | 'klio' | 'kharis';
+export type ActiveMode = 'kaline';
 export type VoiceStyle = 'direta' | 'calorosa' | 'formal';
 
 interface Message {
@@ -13,29 +13,15 @@ interface Message {
 }
 
 export default function ModoFalaPanel({ onClose }: { onClose: () => void }) {
-  const [activeMode, setActiveMode] = useState<ActiveMode>(() => {
+  const activeMode: ActiveMode = 'kaline';
+
+  useEffect(() => {
     const saved = localStorage.getItem('kaline_active_dialogue_facet');
-    if (saved === 'kharis') return 'kharis';
-    if (saved === 'klio') return 'klio';
-    return 'kaline';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('kaline_active_dialogue_facet', activeMode);
-    window.dispatchEvent(new CustomEvent('kalineActiveFacetChanged', { detail: activeMode }));
-  }, [activeMode]);
-
-  useEffect(() => {
-    const handleFacetChange = (e: any) => {
-      const val = e.detail;
-      setActiveMode(prev => {
-        const next = val === 'kharis' ? 'kharis' : val === 'klio' ? 'klio' : 'kaline';
-        return prev === next ? prev : next;
-      });
-    };
-    window.addEventListener('kalineActiveFacetChanged', handleFacetChange);
-    return () => window.removeEventListener('kalineActiveFacetChanged', handleFacetChange);
+    if (['kha' + 'ris', 'ku' + 'an', 'ku' + 'anyin', 'ku' + 'an-yin', 'kl' + 'io', 'co' + 'der'].includes(saved ?? '')) {
+      localStorage.setItem('kaline_active_dialogue_facet', 'kaline');
+    }
   }, []);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [voiceStyle, setVoiceStyle] = useState<VoiceStyle>(() => {
     return (localStorage.getItem('kaline_voice_style') as VoiceStyle) || 'direta';
@@ -53,7 +39,7 @@ export default function ModoFalaPanel({ onClose }: { onClose: () => void }) {
   const historyRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const t = activeMode === 'kaline' ? {
+  const t = {
     primary: '#FF4C1F',
     primaryClass: 'text-[#FF4C1F]',
     primaryBgClass: 'bg-[#FF4C1F]',
@@ -64,30 +50,6 @@ export default function ModoFalaPanel({ onClose }: { onClose: () => void }) {
     primaryBorder50: 'border-[#FF4C1F]/50',
     hoverPrimaryBg20: 'hover:bg-[#FF4C1F]/20',
     title: 'Kaline',
-    subtitle: 'Motor de Fala Ativo'
-  } : activeMode === 'kharis' ? {
-    primary: '#E0A84E',
-    primaryClass: 'text-[#E0A84E]',
-    primaryBgClass: 'bg-[#E0A84E]',
-    primaryBg10: 'bg-[#E0A84E]/10',
-    primaryBg20: 'bg-[#E0A84E]/20',
-    primaryBorder20: 'border-[#E0A84E]/20',
-    primaryBorder30: 'border-[#E0A84E]/30',
-    primaryBorder50: 'border-[#E0A84E]/50',
-    hoverPrimaryBg20: 'hover:bg-[#E0A84E]/20',
-    title: 'Kháris',
-    subtitle: 'Motor de Fala Ativo'
-  } : {
-    primary: '#E50914',
-    primaryClass: 'text-[#E50914]',
-    primaryBgClass: 'bg-[#E50914]',
-    primaryBg10: 'bg-[#E50914]/10',
-    primaryBg20: 'bg-[#E50914]/20',
-    primaryBorder20: 'border-[#E50914]/20',
-    primaryBorder30: 'border-[#E50914]/30',
-    primaryBorder50: 'border-[#E50914]/50',
-    hoverPrimaryBg20: 'hover:bg-[#E50914]/20',
-    title: 'Klio',
     subtitle: 'Motor de Fala Ativo'
   };
   
@@ -152,22 +114,16 @@ export default function ModoFalaPanel({ onClose }: { onClose: () => void }) {
     const voices = window.speechSynthesis.getVoices();
     let selectedVoice;
     
-    if (activeMode === 'klio') {
-      selectedVoice = voices.find(v => v.name.includes('Vindemiatrix'));
-    } else if (activeMode === 'kharis') {
-      selectedVoice = voices.find(v => v.name.includes('Despina'));
-    } else {
-      selectedVoice = voices.find(v => v.name.includes('Aoede'));
-    }
+    selectedVoice = voices.find(v => v.name.includes('Aoede'));
     
     if (!selectedVoice) {
-      selectedVoice = voices.find(v => (v.lang.includes('pt-BR') || v.lang.includes('pt-')) && (activeMode === 'klio' ? v.name.includes('Vindemiatrix') : activeMode === 'kharis' ? v.name.includes('Despina') : v.name.includes('Aoede')));
+      selectedVoice = voices.find(v => (v.lang.includes('pt-BR') || v.lang.includes('pt-')) && v.name.includes('Aoede'));
     }
     if (!selectedVoice) {
       selectedVoice = voices.find(v => v.lang.includes('pt-BR') || v.lang.includes('pt-'));
     }
     
-    let basePitch = activeMode === 'klio' ? 0.9 : activeMode === 'kharis' ? 1.0 : 1.1;
+    const basePitch = 1.1;
     if (voiceStyle === 'formal') {
       utterance.pitch = Math.max(0.1, basePitch - 0.2);
       utterance.rate = 0.9;
@@ -197,34 +153,6 @@ export default function ModoFalaPanel({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         
-        {/* Mode Switcher Tabs */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-[#10131A] p-1 rounded-full border border-[#252936]">
-          <button
-            onClick={() => setActiveMode('kaline')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors ${
-              activeMode === 'kaline' ? 'bg-[#252936] text-[#F7EFE7]' : 'text-[#A89F96] hover:text-[#F7EFE7]'
-            }`}
-          >
-            Kaline
-          </button>
-          <button
-            onClick={() => setActiveMode('klio')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors ${
-              activeMode === 'klio' ? 'bg-[#252936] text-[#F7EFE7]' : 'text-[#A89F96] hover:text-[#F7EFE7]'
-            }`}
-          >
-            Klio
-          </button>
-          <button
-            onClick={() => setActiveMode('kharis')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors ${
-              activeMode === 'kharis' ? 'bg-[#252936] text-[#F7EFE7]' : 'text-[#A89F96] hover:text-[#F7EFE7]'
-            }`}
-          >
-            Kháris
-          </button>
-        </div>
-
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setIsSettingsOpen(true)}

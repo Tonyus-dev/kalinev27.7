@@ -174,7 +174,7 @@ export default function PRPlanView() {
               </h5>
               <p className="text-[11px] text-indigo-900/80 leading-relaxed">
                 {selectedPRIndex === 0 && "Copie o SQL ao lado e cole diretamente no SQL Editor do console do seu projeto no Supabase. Isso criará instantaneamente as tabelas com relacionamentos e regras de segurança (RLS)."}
-                {selectedPRIndex === 1 && "Instale o Hono (npm i hono) e o cliente Supabase na sua pasta de Worker. Esse roteamento leve responde em <10ms na borda do Cloudflare."}
+                {selectedPRIndex === 1 && "Instale o Hono (npm i hono) e a biblioteca Supabase na sua pasta de Worker. Esse roteamento leve responde em <10ms na borda do Cloudflare."}
                 {selectedPRIndex === 2 && "No front-end, a fila offline garante que os hábitos concluídos continuem salvos na memória local caso o usuário perca o sinal de rede em elevadores ou metrô."}
                 {selectedPRIndex === 3 && "iOS impõe restrições estritas a PWAs: o arquivo manifest deve usar caminhos válidos e o usuário deve instalar manualmente pelo botão de compartilhar do Safari."}
                 {selectedPRIndex === 4 && "Configure os tokens CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID nas 'Secrets' do seu repositório GitHub para ativar o deploy automático ao realizar push na branch main."}
