@@ -6,6 +6,9 @@ import regrasProdutoReal from '../../docs/identity/04_REGRAS_PRODUTO_REAL.md?raw
 import kuan from '../../docs/identity/05_KUAN_YIN.md?raw';
 import kharis from '../../docs/identity/06_KHARIS.md?raw';
 import limitesV27 from '../../docs/identity/07_LIMITES_V27.md?raw';
+import ledger from '../../docs/identity/08_LEDGER.md?raw';
+
+const LEDGER_REQUEST_PATTERN = /\b(ledger|mnem[oó]sine|mnemosine|handoff|evento aprov[aá]vel|facetas|continuidade online\/local|registro para klio|registro para kuan|registro para kh[aá]ris)\b/i;
 
 const CODE_REQUEST_PATTERN = /\b(c[oó]digo|programa(?:r|ç[aã]o)?|debug|pr técnico|pull request|codex|lovable|cloudflare|supabase|arquitetura técnica|developer\s+mode|promptforge|vibe-?code|coder|react|typescript|javascript)\b/i;
 
@@ -13,6 +16,10 @@ export const V27_CODE_RESPONSE = 'A V27 não escreve código. Esse escopo será 
 
 export function isV27CodeRequest(userText: string): boolean {
   return CODE_REQUEST_PATTERN.test(userText);
+}
+
+function isLedgerRequest(userText: string): boolean {
+  return LEDGER_REQUEST_PATTERN.test(userText);
 }
 
 export function buildIdentityContext(userText: string, facet: 'kaline' | 'kharis' | 'kuan' = 'kaline'): string {
@@ -26,6 +33,11 @@ export function buildIdentityContext(userText: string, facet: 'kaline' | 'kharis
 
   if (isV27CodeRequest(userText)) {
     docs.push('[LIMITES V27]\n' + limitesV27);
+    return docs.join('\n\n---\n\n');
+  }
+
+  if (isLedgerRequest(userText)) {
+    docs.push('[LEDGER]\n' + ledger);
     return docs.join('\n\n---\n\n');
   }
 
