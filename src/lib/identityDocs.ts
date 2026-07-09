@@ -7,7 +7,7 @@ import kuan from '../../docs/identity/05_KUAN_YIN.md?raw';
 import kharis from '../../docs/identity/06_KHARIS.md?raw';
 import limitesV27 from '../../docs/identity/07_LIMITES_V27.md?raw';
 
-const CODE_REQUEST_PATTERN = /\b(c[oó]digo|programa(?:r|ç[aã]o)?|debug|debugging|pr técnico|pull request|codex|lovable|cloudflare|supabase|arquitetura técnica|developer mode|promptforge|vibe-?code|coder|react|typescript|javascript)\b/i;
+const CODE_REQUEST_PATTERN = /\b(c[oó]digo|programa(?:r|ç[aã]o)?|debug|pr técnico|pull request|codex|lovable|cloudflare|supabase|arquitetura técnica|developer\s+mode|promptforge|vibe-?code|coder|react|typescript|javascript)\b/i;
 
 export const V27_CODE_RESPONSE = 'A V27 não escreve código. Esse escopo será atendido em app separado: Klio.';
 

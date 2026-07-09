@@ -134,7 +134,7 @@ export default function ForgePanel() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-slate-400">
         <RefreshCw className="w-8 h-8 animate-spin text-orange-500 mb-3" />
-        <p className="text-xs font-bold uppercase tracking-wider">Aguardando Hefaístia Forge...</p>
+        <p className="text-xs font-bold uppercase tracking-wider">Aguardando Forja Local...</p>
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function ForgePanel() {
             </span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight text-[#F7EFE7] font-serif leading-none flex items-center gap-2">
-            Hefaístia Forge
+            Forja Local
           </h1>
           <p className="text-xs text-[#A89F96] max-w-xl leading-relaxed">
             Forja local de inteligência artificial. Processamento local de tarefas estruturadas através do Ollama rodando os modelos leve e específico.
@@ -259,7 +259,7 @@ export default function ForgePanel() {
       {/* Task Runner & Vibe Code Sandbox */}
       <div className="bg-[#0B0D12] rounded-[24px] border border-[#252936] p-5 space-y-4 shadow-md">
         <h3 className="text-xs font-black uppercase tracking-wider text-[#F7EFE7] flex items-center gap-2">
-          <Code className="w-4.5 h-4.5 text-[#FF4C1F]" /> Prompt Direto para Forja Local (Vibe Coder / qwen2.5-coder)
+          <Code className="w-4.5 h-4.5 text-[#FF4C1F]" /> Prompt Direto para Forja Local (Modo técnico local / modelo-local)
         </h3>
 
         <div className="flex gap-2.5">
